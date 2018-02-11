@@ -1,0 +1,14 @@
+#login-button {
+  background-color: #3c4146;
+  color: #eef4ec;
+  padding: 1em;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-left: -100px;
+  margin-top: -1em;
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  width: 150px;
+  text-align: center;
+}
