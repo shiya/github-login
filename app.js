@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const session = require('express-session');
-const request = require('request');
 const axios = require('axios');
 const qs = require('querystring');
 const randomString = require('randomstring');
@@ -59,22 +58,21 @@ app.all('/redirect', (req, res) => {
 });
 
 app.get('/user', (req, res) => {
-  request.get(
+  axios.get('https://api.github.com/user/public_emails',
     {
-      url: 'https://api.github.com/user/public_emails',
       headers: {
         Authorization: 'token ' + req.session.access_token,
         'User-Agent': 'Login-App'
       }
-    },
-    (error, response, body) => {
-      res.send(
-        "<p>You're logged in! Here's all your emails on GitHub: </p>" +
-        body +
-        '<p>Go back to <a href="./">log in page</a>.</p>'
-      );
-    }
-  );
+    }).then(
+      response => {
+        res.send(
+          "<p>You're logged in! Here's all your emails on GitHub: </p>" +
+          JSON.stringify(response.data) +
+          '<p>Go back to <a href="./">log in page</a>.</p>'
+        );
+      }
+    );
 });
 
 app.listen(port, () => {

@@ -10,12 +10,12 @@
   "author": "Shiya Luo <luo.shiya@gmail.com> (http://www.shiyaluo.com/)",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.21.1",
     "dotenv": "^9.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "nodemon": "^2.0.7",
-    "randomstring": "^1.2.1",
-    "request": "^2.83.0"
+    "randomstring": "^1.2.1"
   },
   "repository": "https://github.com/shiya/github-login.git"
 }
