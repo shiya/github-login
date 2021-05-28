@@ -2,9 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const session = require('express-session');
-const request = require('request');
+const axios = require('axios');
 const qs = require('querystring');
-const url = require('url');
 const randomString = require('randomstring');
 
 const port = process.env.PORT || 3000;
@@ -41,45 +40,39 @@ app.all('/redirect', (req, res) => {
   const code = req.query.code;
   const returnedState = req.query.state;
   if (req.session.csrf_string === returnedState) {
-    request.post(
-      {
-        url:
-          'https://github.com/login/oauth/access_token?' +
-          qs.stringify({
-            client_id: process.env.CLIENT_ID,
-            client_secret: process.env.CLIENT_SECRET,
-            code: code,
-            redirect_uri: redirect_uri,
-            state: req.session.csrf_string
-          })
-      },
-      (error, response, body) => {
-        req.session.access_token = qs.parse(body).access_token;
+    axios.post('https://github.com/login/oauth/access_token?' +
+      qs.stringify({
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        code: code,
+        redirect_uri: redirect_uri,
+        state: req.session.csrf_string
+      }), {})
+      .then(response => {
+        req.session.access_token = qs.parse(response.data).access_token;
         res.redirect('/user');
-      }
-    );
+      });
   } else {
     res.redirect('/');
   }
 });
 
 app.get('/user', (req, res) => {
-  request.get(
+  axios.get('https://api.github.com/user/public_emails',
     {
-      url: 'https://api.github.com/user/public_emails',
       headers: {
         Authorization: 'token ' + req.session.access_token,
         'User-Agent': 'Login-App'
       }
-    },
-    (error, response, body) => {
-      res.send(
-        "<p>You're logged in! Here's all your emails on GitHub: </p>" +
-          body +
+    }).then(
+      response => {
+        res.send(
+          "<p>You're logged in! Here's all your emails on GitHub: </p>" +
+          JSON.stringify(response.data) +
           '<p>Go back to <a href="./">log in page</a>.</p>'
-      );
-    }
-  );
+        );
+      }
+    );
 });
 
 app.listen(port, () => {
